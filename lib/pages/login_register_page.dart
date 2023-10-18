@@ -1,3 +1,4 @@
+import 'package:dynamic_list/pages/reset.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dynamic_list/auth.dart';
@@ -84,6 +85,15 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget _forgotPasswordButton() {
+    return TextButton(
+      onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => ResetPage()))
+        
+      ,
+      child: Text('Forgot Password?'),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +108,8 @@ class _LoginPageState extends State<LoginPage> {
           _entryField('password', _controllerPassword),
           _errorMessage(),
           _submitButton(),
-          _loginOrRegisterButton()
+          _loginOrRegisterButton(),
+          _forgotPasswordButton()
         ]
       ),
 
