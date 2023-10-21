@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:dynamic_list/auth.dart';
 
 class Homepage extends StatefulWidget {
   final String listName;
@@ -12,30 +10,13 @@ class Homepage extends StatefulWidget {
 }
 
 
-
 class _HomepageState extends State<Homepage> {
-  final User? user = Auth().currentUser;
   List<Map<String, dynamic>> items = [
    
   ];
 
-  Future<void> signOut() async {
-    await Auth().signOut();
-  }
-
   Widget _title() {
     return const Text('Firebase Auth');
-  }
-
-  Widget _userUid() {
-    return Text(user?.email ?? 'User email');
-  }
-
-  Widget _signOutButton() {
-    return ElevatedButton(
-      onPressed: signOut,
-      child: const Text('Sign Out'),
-    );
   }
 
   Widget _itemList() {
@@ -149,8 +130,6 @@ class _HomepageState extends State<Homepage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _userUid(),
-            _signOutButton(),
             SizedBox(height: 20),
             _itemList(),
             ElevatedButton(

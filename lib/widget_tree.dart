@@ -1,4 +1,3 @@
-import 'package:dynamic_list/pages/home_page.dart';
 import 'package:dynamic_list/auth.dart';
 import 'package:dynamic_list/pages/list_page.dart';
 import 'package:dynamic_list/pages/login_register_page.dart';
