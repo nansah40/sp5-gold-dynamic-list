@@ -1,5 +1,6 @@
 import 'package:dynamic_list/pages/home_page.dart';
 import 'package:dynamic_list/auth.dart';
+import 'package:dynamic_list/pages/list_page.dart';
 import 'package:dynamic_list/pages/login_register_page.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +19,7 @@ class _WidgetTreeState extends State<WidgetTree> {
       stream: Auth().authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Homepage();
+          return ListOfListsScreen();
         } else{
           return const LoginPage();
         }
