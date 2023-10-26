@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_list/pages/home_page.dart';
 import 'package:dynamic_list/auth.dart';
@@ -5,11 +8,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class ListOfListsScreen extends StatefulWidget {
   @override
-  
   _ListOfListsScreenState createState() => _ListOfListsScreenState();
 }
 
 class _ListOfListsScreenState extends State<ListOfListsScreen> {
+  final fb = FirebaseDatabase.instance;
   final User? user = Auth().currentUser;
   List<String> lists = [
     'Groceries',
@@ -33,10 +36,11 @@ class _ListOfListsScreenState extends State<ListOfListsScreen> {
     return Text(user?.email ?? 'User email');
   }
 
- 
-
   @override
   Widget build(BuildContext context) {
+    var rng = Random();
+    var k = rng.nextInt(10000);
+    final ref = fb.ref().child('ListOfLists/$k');
     return Scaffold(
       appBar: AppBar(
         title: Text('Lists of Lists'),
@@ -68,18 +72,21 @@ class _ListOfListsScreenState extends State<ListOfListsScreen> {
                         builder: (context) {
                           return AlertDialog(
                             title: Text('Delete List'),
-                            content: Text('Are you sure you want to delete this list?'),
+                            content: Text(
+                                'Are you sure you want to delete this list?'),
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context).pop(); // Close the dialog
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog
                                 },
                                 child: Text('Cancel'),
                               ),
                               TextButton(
                                 onPressed: () {
                                   deleteList(index); // Delete the list
-                                  Navigator.of(context).pop(); // Close the dialog
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog
                                 },
                                 child: Text('Delete'),
                               ),
@@ -103,7 +110,8 @@ class _ListOfListsScreenState extends State<ListOfListsScreen> {
           showDialog(
             context: context,
             builder: (context) {
-              TextEditingController listNameController = TextEditingController();
+              TextEditingController listNameController =
+                  TextEditingController();
               return AlertDialog(
                 title: Text('Create a New List'),
                 content: TextField(
@@ -119,6 +127,9 @@ class _ListOfListsScreenState extends State<ListOfListsScreen> {
                   ),
                   TextButton(
                     onPressed: () {
+                      ref.set({
+                        'list name': listNameController.text,
+                      }).asStream();
                       final name = listNameController.text;
                       if (name.isNotEmpty) {
                         addList(name);
