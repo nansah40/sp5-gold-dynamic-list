@@ -1,3 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class Homepage extends StatefulWidget {
@@ -9,11 +12,20 @@ class Homepage extends StatefulWidget {
   _HomepageState createState() => _HomepageState();
 }
 
-
 class _HomepageState extends State<Homepage> {
-  List<Map<String, dynamic>> items = [
-   
-  ];
+  User? user;
+  DatabaseReference? taskRef;
+  List<Map<String, dynamic>> items = [];
+
+  @override
+  void initState() {
+    user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      taskRef =
+          FirebaseDatabase.instance.ref().child('Grocery').child(user!.uid);
+    }
+    super.initState();
+  }
 
   Widget _title() {
     return const Text('Firebase Auth');
@@ -33,7 +45,7 @@ class _HomepageState extends State<Homepage> {
             },
             trailing: IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () {
+              onPressed: () async {
                 _deleteItem(index);
               },
             ),
@@ -44,15 +56,22 @@ class _HomepageState extends State<Homepage> {
   }
 
   void _addNewItem(String name, double price) {
+    final DatabaseReference taskRef =
+        FirebaseDatabase.instance.reference().child('Grocery');
+    String key = taskRef.push().key.toString();
+    taskRef.push().set({
+      'key': key,
+      'name': name,
+      'price': price,
+    });
     setState(() {
       items.add({'name': name, 'price': price});
     });
   }
 
   void _editItem(int index) async {
-    TextEditingController nameController = TextEditingController();
-    TextEditingController priceController = TextEditingController();
-
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController priceController = TextEditingController();
     if (index >= 0) {
       nameController.text = items[index]['name'];
       priceController.text = items[index]['price'].toString();
@@ -85,7 +104,7 @@ class _HomepageState extends State<Homepage> {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 final name = nameController.text;
                 final price = double.parse(priceController.text);
                 if (index >= 0) {
