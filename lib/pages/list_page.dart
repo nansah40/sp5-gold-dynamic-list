@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_list/pages/home_page.dart';
 import 'package:dynamic_list/auth.dart';
@@ -5,15 +8,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class ListOfListsScreen extends StatefulWidget { // This class represents the main screen of the app, displaying a list of lists.
   @override
-  
-  _ListOfListsScreenState createState() => _ListOfListsScreenState(); // Create the state for this widget.
+  _ListOfListsScreenState createState() => _ListOfListsScreenState();
 }
 
 class _ListOfListsScreenState extends State<ListOfListsScreen> {
-  final User? user = Auth().currentUser; // Get the current user using the Auth class
-
-  
-  List<String> lists = [ // Initialize a list of example list names.
+  final fb = FirebaseDatabase.instance;
+  final User? user = Auth().currentUser;
+  List<String> lists = [
     'Groceries',
     'Soccer team',
     'Movies to Watch',
@@ -35,10 +36,11 @@ class _ListOfListsScreenState extends State<ListOfListsScreen> {
     return Text(user?.email ?? 'User email');
   }
 
- 
-
   @override
   Widget build(BuildContext context) {
+    var rng = Random();
+    var k = rng.nextInt(10000);
+    final ref = fb.ref().child('ListOfLists/$k');
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Lists'), // Set the text displayed on the appbar 
@@ -72,18 +74,21 @@ class _ListOfListsScreenState extends State<ListOfListsScreen> {
                         builder: (context) {
                           return AlertDialog(
                             title: Text('Delete List'),
-                            content: Text('Are you sure you want to delete this list?'),
+                            content: Text(
+                                'Are you sure you want to delete this list?'),
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context).pop(); // Close the dialog
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog
                                 },
                                 child: Text('Cancel'),
                               ),
                               TextButton(
                                 onPressed: () {
                                   deleteList(index); // Delete the list
-                                  Navigator.of(context).pop(); // Close the dialog if the user cancels.
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog
                                 },
                                 child: Text('Delete'),
                               ),
@@ -107,8 +112,9 @@ class _ListOfListsScreenState extends State<ListOfListsScreen> {
           showDialog(
             context: context,
             builder: (context) {
-              TextEditingController listNameController = TextEditingController(); // TextEditingContoller for reading and managing the list name that user inputs 
-              return AlertDialog( // Method used to display a dialog box 
+              TextEditingController listNameController =
+                  TextEditingController();
+              return AlertDialog(
                 title: Text('Create a New List'),
                 content: TextField(
                   controller: listNameController,
@@ -123,7 +129,10 @@ class _ListOfListsScreenState extends State<ListOfListsScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      final name = listNameController.text; // Set name variable to the contents of the textEditing controller 
+                      ref.set({
+                        'list name': listNameController.text,
+                      }).asStream();
+                      final name = listNameController.text;
                       if (name.isNotEmpty) {
                         addList(name); // If a name is provided, call the 'addList' function to add a new list.
                       }
