@@ -1,40 +1,42 @@
 import 'package:flutter/material.dart';
 
 class Homepage extends StatefulWidget {
-  final String listName;
+  final String listName; // Create final variable listName 
 
-  Homepage({required this.listName, Key? key}) : super(key: key);
+  Homepage({required this.listName, Key? key}) : super(key: key); // constructor for the Homepage class 
 
   @override
-  _HomepageState createState() => _HomepageState();
+  _HomepageState createState() => _HomepageState(); // Create Homepage state 
 }
 
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<Homepage> { // The list of items to be displayed. Initially empty.
   List<Map<String, dynamic>> items = [
    
   ];
 
-  Widget _title() {
-    return const Text('Firebase Auth');
+  Widget _title() { // Widget for the title 
+    return const Text('List Name');
   }
 
-  Widget _itemList() {
-    return Expanded(
-      child: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          return ListTile(
-            title: Text(item['name'].toString()),
-            subtitle: Text('Price: \$${item['price']}'),
+  Widget _itemList() { // Widget for the list of items 
+    return Expanded(// Expanded is a widget that ensures its child (in this case, the _itemList) takes up all available vertical space within its parent widget.
+                    // Expanded is used to make the _itemList fill the remaining vertical space below other widgets in the column, ensuring that the list can scroll within that space.
+
+      child: ListView.builder( // Widget that creates a scrollable list of items 
+        itemCount: items.length, // The number of items to display.
+        itemBuilder: (context, index) { //callback function that defines how each item in the list should be built.
+          final item = items[index]; // Get the item data at the current index.
+          return ListTile( //creates a ListTile for each item, displaying the item name, price, and an optional delete icon
+            title: Text(item['name'].toString()), // Display the item's name.
+            subtitle: Text('Price: \$${item['price']}'), // Display the item's price.
             onTap: () {
-              _editItem(index);
+              _editItem(index); // Call edit item method on tap 
             },
-            trailing: IconButton(
+            trailing: IconButton( // Display delete button after list items
               icon: Icon(Icons.delete),
               onPressed: () {
-                _deleteItem(index);
+                _deleteItem(index); // Call delte item  method when button is pressed 
               },
             ),
           );
@@ -43,15 +45,15 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  void _addNewItem(String name, double price) {
+  void _addNewItem(String name, double price) { // Method for adding new item to the list 
     setState(() {
       items.add({'name': name, 'price': price});
     });
   }
 
-  void _editItem(int index) async {
-    TextEditingController nameController = TextEditingController();
-    TextEditingController priceController = TextEditingController();
+  void _editItem(int index) async { // Method for editing an item 
+    TextEditingController nameController = TextEditingController(); // Text editing controllers for name
+    TextEditingController priceController = TextEditingController(); // Text editing controller for price 
 
     if (index >= 0) {
       nameController.text = items[index]['name'];
@@ -103,14 +105,14 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  void _updateItem(int index, String name, double price) {
+  void _updateItem(int index, String name, double price) { // Method for updating list item 
     setState(() {
       items[index]['name'] = name;
       items[index]['price'] = price;
     });
   }
 
-  void _deleteItem(int index) {
+  void _deleteItem(int index) { // Method to remove item 
     setState(() {
       items.removeAt(index);
     });
