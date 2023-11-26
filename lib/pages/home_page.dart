@@ -4,32 +4,36 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class Homepage extends StatefulWidget {
-  final String listName; // Create final variable listName 
+  final String listName;
+  final String listID; // Add this
 
-  Homepage({required this.listName, Key? key}) : super(key: key); // constructor for the Homepage class 
+  Homepage({required this.listName, required this.listID, Key? key}) : super(key: key);
 
   @override
-  _HomepageState createState() => _HomepageState(); // Create Homepage state 
+  _HomepageState createState() => _HomepageState();
 }
 
 class _HomepageState extends State<Homepage> {
   User? user;
   DatabaseReference? taskRef;
+  String? userUid;
   List<Map<String, dynamic>> items = [];
 
-  @override
-  void initState() {
-    user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      taskRef =
-          FirebaseDatabase.instance.ref().child('Grocery').child(user!.uid);
-    }
-    super.initState();
+  
+@override
+void initState() {
+  super.initState();
+  user = FirebaseAuth.instance.currentUser;
+  userUid = user?.uid;
+  if (user != null) {
+    taskRef = FirebaseDatabase.instance.ref().child('users/$userUid/lists/${widget.listID}/items');
+    // Add listener to taskRef here to update items
   }
+}
 
-  Widget _title() { // Widget for the title 
-    return const Text('List Name');
-  }
+  Widget _title() {
+  return Text(widget.listName);
+}
 
   Widget _itemList() { // Widget for the list of items 
     return Expanded(// Expanded is a widget that ensures its child (in this case, the _itemList) takes up all available vertical space within its parent widget.
@@ -58,11 +62,9 @@ class _HomepageState extends State<Homepage> {
   }
 
   void _addNewItem(String name, double price) {
-    final DatabaseReference taskRef =
-        FirebaseDatabase.instance.reference().child('Grocery');
-    String key = taskRef.push().key.toString();
-    taskRef.push().set({
-      'key': key,
+  String key = taskRef?.push().key ?? '';  // Ensure taskRef is not null
+  if (key.isNotEmpty) {
+    taskRef?.child(key).set({  // Use ?. to safely access child
       'name': name,
       'price': price,
     });
@@ -70,6 +72,7 @@ class _HomepageState extends State<Homepage> {
       items.add({'name': name, 'price': price});
     });
   }
+}
 
   void _editItem(int index) async {
     final TextEditingController nameController = TextEditingController();
